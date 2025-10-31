@@ -1,0 +1,24 @@
+{
+  "opponent_ease": {
+    "n": 32,
+    "mean": 48.625,
+    "std": 24.110099025097345,
+    "dagostino_k2_stat": 1.1880208860811525,
+    "dagostino_k2_p": 0.5521086385839097,
+    "shapiro_stat": 0.9638036951897845,
+    "shapiro_p": 0.3477893455084898,
+    "is_normal_alpha_0.05": true,
+    "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_Opponent_Ease_0_100.png"
+  },
+  "teamweek_sos": {
+    "n": 768,
+    "mean": 49.5625,
+    "std": 15.223807766674756,
+    "dagostino_k2_stat": 0.8753472404546667,
+    "dagostino_k2_p": 0.6455364385146023,
+    "shapiro_stat": 0.9968903313124013,
+    "shapiro_p": 0.144196450065113,
+    "is_normal_alpha_0.05": true,
+    "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_TeamWeek_SOS_0_100.png"
+  }
+}
