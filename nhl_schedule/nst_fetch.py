@@ -6,6 +6,9 @@ import pandas as pd
 import requests
 from .config import SEASON_LABEL, CACHE_DIR, CACHE_REFRESH_DAYS
 
+# Global flag to force bypassing cache (can be set by CLI)
+FORCE_CACHE_REFRESH = False
+
 TEAMTABLE_URL = "https://www.naturalstattrick.com/teamtable.php"
 
 # Common columns we need from NST team table
@@ -113,13 +116,25 @@ def fetch_team_table(sit: str, loc: str | None = None) -> pd.DataFrame:
     key = f"team_{sit}_{loc or 'NA'}"
     fp = _cache_file(key)
 
-    # Check if we want to force refresh by setting refresh days to 0
-    force_refresh = CACHE_REFRESH_DAYS <= 0
+    # Check if we want to force refresh by setting refresh days to 0 or via global flag
+    force_refresh = (CACHE_REFRESH_DAYS <= 0) or FORCE_CACHE_REFRESH
 
     # Use cache if available and not forcing refresh
     if not force_refresh and fp.exists() and (time.time() - fp.stat().st_mtime) < CACHE_REFRESH_DAYS * 86400:
         print(f"Loading from cache: {fp}")
-        return pd.read_parquet(fp)
+        cached = pd.read_parquet(fp)
+        # Validate cached content
+        required_cols = ["team"] + list(FEATURE_MAP.values())
+        has_cols = all(c in cached.columns for c in required_cols)
+        non_empty = len(cached) > 0
+        if non_empty and has_cols and cached["team"].nunique() >= 20:
+            return cached
+        else:
+            print("WARNING: Cached NST data is empty or invalid; ignoring cache and refetching")
+            try:
+                fp.unlink(missing_ok=True)
+            except Exception:
+                pass
 
     # Additional parameters based on the URL you provided
     params = dict(
@@ -203,9 +218,19 @@ def fetch_team_table(sit: str, loc: str | None = None) -> pd.DataFrame:
         df["team"] = df["team"].map(to_code)
         print(f"Mapped {len(df)} teams to codes")
 
-        # Save to cache
-        df.to_parquet(fp, index=False)
-        print(f"Saved to cache: {fp}")
+        # Post-fetch validation
+        required_cols = ["team"] + list(FEATURE_MAP.values())
+        has_cols = all(c in df.columns for c in required_cols)
+        non_empty = len(df) > 0
+        unique_teams = df["team"].nunique() if non_empty and "team" in df.columns else 0
+        if not non_empty or not has_cols or unique_teams < 20:
+            print(
+                f"WARNING: Fetched NST data seems incomplete (rows={len(df)}, unique_teams={unique_teams}). Will NOT cache this result."
+            )
+        else:
+            # Save to cache only when valid
+            df.to_parquet(fp, index=False)
+            print(f"Saved to cache: {fp}")
 
         return df
 
@@ -216,18 +241,27 @@ def fetch_team_table(sit: str, loc: str | None = None) -> pd.DataFrame:
 
 
 def get_all_situations() -> dict[str, pd.DataFrame]:
-    """Return dict with keys 'sva', 'pp', 'pk' dataframes."""
-    # Since the 2025-2026 season hasn't started yet, we need to simulate data
-    # for testing purposes
-    if SEASON_LABEL == "20252026":
-        print("WARNING: Using simulated data for 2025-2026 season")
-        return _get_simulated_data()
+    """Return dict with keys 'sva', 'pp', 'pk' dataframes.
 
-    return {
-        "sva": fetch_team_table("sva", loc="B"),
-        "pp": fetch_team_table("pp"),
-        "pk": fetch_team_table("pk"),
-    }
+    Always attempts to fetch real NST data. Falls back to empty frames on errors (neutral handling downstream).
+    """
+    try:
+        sva = fetch_team_table("sva", loc="B")
+    except Exception as e:
+        print(f"ERROR fetching SVA data: {e}")
+        sva = pd.DataFrame(columns=["team"] + list(FEATURE_MAP.values()))
+    try:
+        pp = fetch_team_table("pp")
+    except Exception as e:
+        print(f"ERROR fetching PP data: {e}")
+        pp = pd.DataFrame(columns=["team"] + list(FEATURE_MAP.values()))
+    try:
+        pk = fetch_team_table("pk")
+    except Exception as e:
+        print(f"ERROR fetching PK data: {e}")
+        pk = pd.DataFrame(columns=["team"] + list(FEATURE_MAP.values()))
+
+    return {"sva": sva, "pp": pp, "pk": pk}
 
 
 def _get_simulated_data() -> dict[str, pd.DataFrame]:

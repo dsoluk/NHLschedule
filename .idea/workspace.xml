@@ -4,13 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a546ce8a-89e1-476a-910f-20a8b462a541" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/NHLschedule.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="a546ce8a-89e1-476a-910f-20a8b462a541" name="Changes" comment="initial">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_cache/nst_team_pk_NA_20252026.parquet" beforeDir="false" afterPath="$PROJECT_DIR$/_cache/nst_team_pk_NA_20252026.parquet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_cache/nst_team_pp_NA_20252026.parquet" beforeDir="false" afterPath="$PROJECT_DIR$/_cache/nst_team_pp_NA_20252026.parquet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_cache/nst_team_sva_B_20252026.parquet" beforeDir="false" afterPath="$PROJECT_DIR$/_cache/nst_team_sva_B_20252026.parquet" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_plots/normality_Opponent_Ease_0_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/_plots/normality_Opponent_Ease_0_100.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_plots/normality_TeamWeek_SOS_0_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/_plots/normality_TeamWeek_SOS_0_100.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nhl_schedule/build_lookup.py" beforeDir="false" afterPath="$PROJECT_DIR$/nhl_schedule/build_lookup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nhl_schedule/nst_fetch.py" beforeDir="false" afterPath="$PROJECT_DIR$/nhl_schedule/nst_fetch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nhl_schedule/schedule_io.py" beforeDir="false" afterPath="$PROJECT_DIR$/nhl_schedule/schedule_io.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/lookup_table.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output/lookup_table.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/lookup_table.diagnostics.json" beforeDir="false" afterPath="$PROJECT_DIR$/output/lookup_table.diagnostics.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,33 +25,45 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;dsoluk&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/dsoluk/NHLschedule.git&quot;,
+    &quot;accountId&quot;: &quot;bbf4a87e-95b6-43c6-a613-71d70dad8adc&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="34nSVs23XbAxZmO5GttiPM3W878" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -62,11 +79,25 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1761847870362</updated>
-      <workItem from="1761847871506" duration="12753000" />
+      <workItem from="1761847871506" duration="13184000" />
+      <workItem from="1761918467192" duration="4332000" />
     </task>
+    <task id="LOCAL-00001" summary="initial">
+      <option name="closed" value="true" />
+      <created>1761878344096</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1761878344096</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="initial" />
+    <option name="LAST_COMMIT_MESSAGE" value="initial" />
   </component>
 </project>

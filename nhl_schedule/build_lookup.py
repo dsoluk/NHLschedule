@@ -12,13 +12,15 @@ from .config import (
 )
 from .schedule_io import read_schedule
 from .nst_fetch import get_all_situations
+from . import nst_fetch as nst_mod
 from .ratings import build_combined_ease
 from .export import to_lookup_table, write_outputs
 from .diagnostics import normality_report
 
 
 def build(schedule_path: str | None = None, sheet_or_table: str | None = None,
-          out_csv: str | None = None, out_xlsx: str | None = None) -> str:
+          out_csv: str | None = None, out_xlsx: str | None = None,
+          refresh_cache: bool = False) -> str:
     schedule_path = schedule_path or SCHEDULE_XLSX
     sheet_or_table = sheet_or_table or SCHEDULE_SHEET_OR_TABLE
     out_csv = out_csv or str(OUTPUT_CSV)
@@ -31,6 +33,10 @@ def build(schedule_path: str | None = None, sheet_or_table: str | None = None,
 
     # 2) Fetch NST team metrics for SVA, PP, PK
     print("Fetching NST team metrics...")
+    # Apply refresh flag to NST fetch module
+    if refresh_cache:
+        print("Forcing NST cache refresh per --refresh-cache flag")
+        nst_mod.FORCE_CACHE_REFRESH = True
     situ = get_all_situations()
     for key, df in situ.items():
         print(f"Fetched {key} data: {len(df)} teams, columns: {df.columns.tolist()}")
@@ -68,8 +74,9 @@ def main():
     p.add_argument("--table", default=SCHEDULE_SHEET_OR_TABLE, help="Sheet or table name")
     p.add_argument("--out_csv", default=str(OUTPUT_CSV), help="Output CSV path")
     p.add_argument("--out_xlsx", default=str(OUTPUT_XLSX), help="Optional XLSX output path")
+    p.add_argument("--refresh-cache", action="store_true", help="Bypass NST cache and refetch all team tables")
     args = p.parse_args()
-    out_path = build(args.schedule, args.table, args.out_csv, args.out_xlsx)
+    out_path = build(args.schedule, args.table, args.out_csv, args.out_xlsx, refresh_cache=args.refresh_cache)
     print(f"Lookup table written to: {out_path}")
 
 

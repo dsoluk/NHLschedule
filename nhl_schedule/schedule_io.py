@@ -1,5 +1,6 @@
 
 from __future__ import annotations
+import re
 import pandas as pd
 from pandas import Timestamp
 from .config import WEEK_START_DAY, LITENITE_METHOD, LITENITE_MAX_GAMES, LITENITE_FRACTION, TEAM_MAPPING_XLSX, TEAM_MAPPING_SHEET
@@ -21,16 +22,35 @@ def _find_col(df: pd.DataFrame, keys: list[str]) -> str | None:
     return None
 
 
+def _normalize_key(s: str) -> str:
+    """Uppercase, remove punctuation/spaces/dots to normalize mapping keys."""
+    if s is None:
+        return ""
+    s = str(s).upper().strip()
+    # Replace common unicode apostrophes/dots, then remove non-letters
+    s = s.replace("É", "E").replace("É", "E")
+    s = re.sub(r"[^A-Z]", "", s)  # keep only A-Z
+    return s
+
+
 def _load_team_mapping():
-    """Load team name mapping from Team2TM.xlsx"""
+    """Load team name mapping from Team2TM.xlsx with robust column detection and aliases."""
+    base_map: dict[str, str] = {}
     try:
         team_map_df = pd.read_excel(TEAM_MAPPING_XLSX, sheet_name=TEAM_MAPPING_SHEET)
-        # Assuming the columns are 'City' (from schedule) and 'TM' (NST code)
-        return dict(zip(team_map_df['City'].str.upper(), team_map_df['TM']))
+        cols = {c.lower(): c for c in team_map_df.columns}
+        # Try multiple possible header names
+        city_col = cols.get("city") or cols.get("club") or cols.get("team") or list(team_map_df.columns)[0]
+        tm_col = cols.get("tm") or cols.get("abbrev") or list(team_map_df.columns)[-1]
+        for _, row in team_map_df.iterrows():
+            city = _normalize_key(row[city_col])
+            tm = str(row[tm_col]).upper().strip()
+            if city and tm:
+                base_map[city] = tm
     except Exception as e:
         print(f"Warning: Could not load team mapping from {TEAM_MAPPING_XLSX}: {e}")
-        # Fallback mapping for common teams (basic 3-letter codes)
-        return {
+        # Fallback mapping for common teams (City/Club -> TM)
+        fallback = {
             "ANAHEIM": "ANA",
             "BOSTON": "BOS",
             "BUFFALO": "BUF",
@@ -43,20 +63,20 @@ def _load_team_mapping():
             "DETROIT": "DET",
             "EDMONTON": "EDM",
             "FLORIDA": "FLA",
-            "LOS ANGELES": "LAK",
+            "LOSANGELES": "LAK",
             "MINNESOTA": "MIN",
             "MONTREAL": "MTL",
             "NASHVILLE": "NSH",
-            "NEW JERSEY": "NJD",
-            "NEW YORK ISLANDERS": "NYI",
-            "NEW YORK RANGERS": "NYR",
+            "NEWJERSEY": "NJD",
+            "NEWYORKISLANDERS": "NYI",
+            "NEWYORKRANGERS": "NYR",
             "OTTAWA": "OTT",
             "PHILADELPHIA": "PHI",
             "PITTSBURGH": "PIT",
-            "SAN JOSE": "SJS",
+            "SANJOSE": "SJS",
             "SEATTLE": "SEA",
-            "ST. LOUIS": "STL",
-            "TAMPA BAY": "TBL",
+            "STLOUIS": "STL",
+            "TAMPABAY": "TBL",
             "TORONTO": "TOR",
             "UTAH": "UTA",
             "VANCOUVER": "VAN",
@@ -64,10 +84,52 @@ def _load_team_mapping():
             "WASHINGTON": "WSH",
             "WINNIPEG": "WPG",
         }
+        base_map.update(fallback)
+
+    # Add alias keys: dotted/short forms mapping directly to TM codes
+    alias = {
+        "NJ": "NJD", "NJDEVILS": "NJD", "NJERSEY": "NJD", "NJDS": "NJD", "NJ": "NJD",
+        "NJDOT": "NJD", "NJNEWJERSEY": "NJD", "NJDEV": "NJD",
+        "LA": "LAK", "LAKINGS": "LAK", "LOSANGELESKINGS": "LAK",
+        "SJ": "SJS", "SJSANJOSE": "SJS",
+        "TB": "TBL", "TBB": "TBL", "TAMPABAYLIGHTNING": "TBL",
+    }
+
+    # Also map dotted forms like 'N.J' -> 'NJD', 'L.A' -> 'LAK', etc.
+    dotted_alias = {"NJ": "NJD", "LA": "LAK", "SJ": "SJS", "TB": "TBL"}
+
+    # Build final mapping with normalized keys
+    mapping: dict[str, str] = {}
+    for k, v in base_map.items():
+        mapping[_normalize_key(k)] = v
+    for k, v in alias.items():
+        mapping[_normalize_key(k)] = v
+    for k, v in dotted_alias.items():
+        mapping[_normalize_key(k)] = v
+
+    # Also map already-correct 3-letter codes to themselves
+    for tm in set(mapping.values()):
+        mapping[_normalize_key(tm)] = tm
+
+    return mapping
 
 
 # Load the team mapping once
 TEAM_MAPPING = _load_team_mapping()
+
+
+def _map_to_tm(val: str) -> str:
+    key = _normalize_key(val)
+    # Handle common dotted inputs explicitly before lookup
+    if key in ("NJ", "NJD"):
+        return "NJD"
+    if key in ("LA", "LAK"):
+        return "LAK"
+    if key in ("SJ", "SJS"):
+        return "SJS"
+    if key in ("TB", "TBL"):
+        return "TBL"
+    return TEAM_MAPPING.get(key, (str(val).upper().strip()[:3]))
 
 
 def read_schedule(xlsx_path: str, sheet_or_table: str = "schedule") -> pd.DataFrame:
@@ -115,12 +177,8 @@ def read_schedule(xlsx_path: str, sheet_or_table: str = "schedule") -> pd.DataFr
     # Avoid chained-assignment; assign the filled series back to the column
     matchups["is_light_night"] = matchups["is_light_night"].fillna(False)
 
-    # Map teams to NST 3-letter abbreviations using the team mapping
-    matchups["team"] = matchups["team"].astype(str).str.upper().map(
-        lambda x: TEAM_MAPPING.get(x, x[:3])
-    )
-    matchups["opponent"] = matchups["opponent"].astype(str).str.upper().map(
-        lambda x: TEAM_MAPPING.get(x, x[:3])
-    )
+    # Map teams to NST 3-letter abbreviations using robust normalization
+    matchups["team"] = matchups["team"].map(_map_to_tm)
+    matchups["opponent"] = matchups["opponent"].map(_map_to_tm)
 
     return matchups[["date", "week", "team", "opponent", "is_home", "is_light_night"]]
