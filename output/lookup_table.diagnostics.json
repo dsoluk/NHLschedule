@@ -1,23 +1,23 @@
 {
   "opponent_ease": {
     "n": 32,
-    "mean": 58.65625,
-    "std": 25.577833878917502,
-    "dagostino_k2_stat": 2.7940739932225545,
-    "dagostino_k2_p": 0.24732871513668891,
-    "shapiro_stat": 0.9539171297541257,
-    "shapiro_p": 0.1860320244310672,
-    "is_normal_alpha_0.05": true,
+    "mean": 51.625,
+    "std": 26.809221827572692,
+    "dagostino_k2_stat": 6.408760108195057,
+    "dagostino_k2_p": 0.04058405375842258,
+    "shapiro_stat": 0.9526062396850196,
+    "shapiro_p": 0.17084186733313383,
+    "is_normal_alpha_0.05": false,
     "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_Opponent_Ease_0_100.png"
   },
   "teamweek_sos": {
     "n": 768,
-    "mean": 58.25,
-    "std": 16.650747605838404,
-    "dagostino_k2_stat": 21.011973287542798,
-    "dagostino_k2_p": 2.7372090905371966e-05,
-    "shapiro_stat": 0.9861539162607955,
-    "shapiro_p": 1.1806862439953617e-06,
+    "mean": 51.743489583333336,
+    "std": 16.981702294611342,
+    "dagostino_k2_stat": 2.227876530483316,
+    "dagostino_k2_p": 0.32826362284069927,
+    "shapiro_stat": 0.9944412547608951,
+    "shapiro_p": 0.006488805992415878,
     "is_normal_alpha_0.05": false,
     "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_TeamWeek_SOS_0_100.png"
   }

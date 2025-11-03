@@ -1,6 +1,8 @@
 from __future__ import annotations
 import pandas as pd
 import numpy as np
+from datetime import date, timedelta
+from .config import WEEK_START_DAY
 
 
 def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFrame:
@@ -40,6 +42,41 @@ def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFr
         how="left"
     )
 
+    # Helper flags at matchup level
+    # Back-to-back: mark both games when a team plays on consecutive days
+    t = t.sort_values(["team", "date"]).copy()
+    t["prev_date"] = t.groupby("team")["date"].shift(1)
+    t["next_date"] = t.groupby("team")["date"].shift(-1)
+    t["is_b2b"] = (
+        (pd.to_datetime(t["date"]) - pd.to_datetime(t["prev_date"]) == pd.Timedelta(days=1)) |
+        (pd.to_datetime(t["next_date"]) - pd.to_datetime(t["date"]) == pd.Timedelta(days=1))
+    )
+    t["is_b2b"] = t["is_b2b"].fillna(False)
+    t["is_away"] = ~t["is_home"].astype(bool)
+
+    # Today-aware metrics
+    today = date.today()
+    # Determine current season week label using the next scheduled game on/after today
+    # This avoids mismatches between calendar ISO week and season week numbering in the sheet
+    future_mask = pd.to_datetime(t["date"]).dt.date >= today
+    if future_mask.any():
+        next_date = pd.to_datetime(t.loc[future_mask, "date"]).dt.date.min()
+        cweek_series = t.loc[pd.to_datetime(t["date"]).dt.date == next_date, "week"]
+        current_week = int(cweek_series.mode().iloc[0]) if not cweek_series.empty else int(t["week"].max())
+    else:
+        # Season completed relative to today; use the last week label
+        current_week = int(t["week"].max())
+    # Remaining games this week (incl today) per team
+    rem_cur_week = (
+        t[(t["week"] == current_week) & (pd.to_datetime(t["date"]).dt.date >= today)]
+        .groupby("team")["opponent"].count()
+    )
+    print(f"Current week detected: {current_week}; teams with remaining games this week: {len(rem_cur_week)}")
+    try:
+        print(rem_cur_week.head().to_string())
+    except Exception:
+        pass
+
     # Check if merge worked properly
     if 'OppDefenseScore0to100' not in t.columns:
         print("ERROR: OppDefenseScore0to100 column missing after merge!")
@@ -61,6 +98,26 @@ def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFr
         SOS=("OppDefenseScore0to100", "mean"),
         Opponents=("opponent", lambda s: ", ".join(list(s))),
     )
+
+    # Weekly B2B and Away counts
+    weekly_b2b = t.groupby(["team", "week"])['is_b2b'].sum().rename('B2B')
+    weekly_away = t.groupby(["team", "week"])['is_away'].sum().rename('Away')
+    grp = grp.merge(weekly_b2b, on=["team", "week"], how="left").merge(weekly_away, on=["team", "week"], how="left")
+    grp['B2B'] = grp['B2B'].fillna(0).astype(int)
+    grp['Away'] = grp['Away'].fillna(0).astype(int)
+
+    # Games remaining this week (only populated for the current week rows)
+    grp['GamesRestOfWeek'] = np.where(
+        grp['week'].eq(current_week),
+        grp['team'].map(rem_cur_week).fillna(0).astype(int),
+        0
+    )
+
+    # Games Rest of Season based on cumulative Games through the current week (per team)
+    grp = grp.sort_values(['team', 'week']).copy()
+    grp['GamesPlayedThrough'] = grp.groupby('team')['Games'].cumsum()
+    grp['GamesROS'] = (82 - grp['GamesPlayedThrough']).clip(lower=0).astype(int)
+    grp.drop(columns=['GamesPlayedThrough'], inplace=True)
 
     # Debug the grouped data
     print(f"After groupby, shape: {grp.shape}, teams: {grp['team'].nunique()}, weeks: {grp['week'].nunique()}")
@@ -101,7 +158,10 @@ def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFr
     grp["TM"] = grp["team"].astype(str)  # Keep the NST 3-letter code
     grp["Week"] = grp["week"].astype(int)
     grp["Key"] = grp["TM"] + grp["Week"].astype(str)
-    return grp[["TM", "Week", "Games", "LiteNite", "Opponents", "SOS", "MatchUp", "Key"]]
+    return grp[[
+        "TM", "Week", "Games", "LiteNite", "Opponents", "SOS", "MatchUp", "B2B", "Away",
+        "GamesRestOfWeek", "GamesROS", "Key"
+    ]]
 
 
 def write_outputs(df_lookup: pd.DataFrame, csv_path: str | None = None, xlsx_path: str | None = None) -> None:
