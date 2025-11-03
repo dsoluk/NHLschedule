@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a546ce8a-89e1-476a-910f-20a8b462a541" name="Changes" comment="debugging fetch and ease">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_cache/nst_team_pk_NA_20252026.parquet" beforeDir="false" afterPath="$PROJECT_DIR$/_cache/nst_team_pk_NA_20252026.parquet" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_cache/nst_team_pp_NA_20252026.parquet" beforeDir="false" afterPath="$PROJECT_DIR$/_cache/nst_team_pp_NA_20252026.parquet" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_cache/nst_team_sva_B_20252026.parquet" beforeDir="false" afterPath="$PROJECT_DIR$/_cache/nst_team_sva_B_20252026.parquet" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_plots/normality_Opponent_Ease_0_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/_plots/normality_Opponent_Ease_0_100.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_plots/normality_TeamWeek_SOS_0_100.png" beforeDir="false" afterPath="$PROJECT_DIR$/_plots/normality_TeamWeek_SOS_0_100.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nhl_schedule/export.py" beforeDir="false" afterPath="$PROJECT_DIR$/nhl_schedule/export.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/lookup_table.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output/lookup_table.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output/lookup_table.diagnostics.json" beforeDir="false" afterPath="$PROJECT_DIR$/output/lookup_table.diagnostics.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pyproject.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +48,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "add__row__nxtwk",
+    "git-widget-placeholder": "master",
     "junie.onboarding.icon.badge.shown": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
