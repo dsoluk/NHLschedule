@@ -5,7 +5,9 @@ from datetime import date, timedelta
 from .config import WEEK_START_DAY
 
 
-def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFrame:
+def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame,
+                    opp_ease_last: pd.DataFrame | None = None,
+                    *, weeks: int = 25) -> pd.DataFrame:
     """Aggregate per team/week and attach opponent difficulty.
 
     Returns columns: TM, Week, Games, LiteNite, Opponents, SOS, MatchUp, Key
@@ -18,6 +20,8 @@ def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFr
     print(f"Opponent codes in matchups: {matchups['opponent'].unique().tolist()[:5]}...")
     print(f"opp_ease shape: {opp_ease.shape}, columns: {opp_ease.columns.tolist()}")
     print(f"Team codes in opp_ease: {opp_ease['team'].unique().tolist()}")
+    if opp_ease_last is not None and len(opp_ease_last) > 0:
+        print(f"opp_ease_last shape: {opp_ease_last.shape}")
 
     # Verify OppDefenseScore0to100 values are not all the same
     if 'OppDefenseScore0to100' in opp_ease.columns:
@@ -29,18 +33,54 @@ def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFr
         print("ERROR: OppDefenseScore0to100 column missing from opp_ease dataframe")
 
     # Important: Make sure team codes match between dataframes
-    matchup_teams = set(matchups['opponent'].unique())
-    ease_teams = set(opp_ease['team'].unique())
+    # Ensure both sides are strings and uppercased 3-letter codes for reliable comparison
+    matchup_teams = set(pd.Index(matchups['opponent'].astype(str).str.upper()).unique())
+    ease_teams = set(pd.Index(opp_ease['team'].astype(str).str.upper()).unique())
     missing_teams = matchup_teams - ease_teams
     if missing_teams:
-        print(f"WARNING: {len(missing_teams)} teams in matchups not found in opp_ease: {missing_teams}")
+        print(f"WARNING: {len(missing_teams)} opponent codes in the schedule were not found in opponent-ease data: {sorted(missing_teams)}")
+        # Provide a helpful hint for common dotted/short forms
+        hints = {
+            "N.J": "NJD",
+            "S.J": "SJS",
+            "T.B": "TBL",
+            "L.A": "LAK",
+            "NJ": "NJD",
+            "SJ": "SJS",
+            "TB": "TBL",
+            "LA": "LAK",
+        }
+        common_triggers = {k for k in hints if k.replace('.', '').upper() in {m.replace('.', '') for m in missing_teams}}
+        if common_triggers:
+            print("Hint: The schedule may contain dotted or short forms. Expected mappings include:")
+            for k in sorted(common_triggers):
+                print(f"  - {k} -> {hints[k]}")
+            print("If your schedule uses these forms, ensure the mapping normalizes to the 3-letter codes above.")
 
-    # Merge the dataframes
+    # Prepare opponent ease (current and optionally last season)
     t = matchups.merge(
         opp_ease.rename(columns={"team": "opponent"}),
         on="opponent",
         how="left"
     )
+    if opp_ease_last is not None and len(opp_ease_last) > 0:
+        t = t.merge(
+            opp_ease_last.rename(columns={"team": "opponent", "OppDefenseScore0to100": "OppDefenseScore0to100_last"})[
+                ["opponent", "OppDefenseScore0to100_last"]
+            ],
+            on="opponent",
+            how="left"
+        )
+        # Blend by sliding week weights: last weight linearly decays from 1 to 0 over weeks
+        # Protect division by zero when weeks==1
+        denom = max(1, weeks - 1)
+        w_last = (1 - (t["week"].astype(float) - 1) / denom).clip(lower=0, upper=1)
+        w_cur = 1 - w_last
+        # If missing last score, treat as current only
+        last_scores = t["OppDefenseScore0to100_last"].fillna(t["OppDefenseScore0to100"]).astype(float)
+        cur_scores = t["OppDefenseScore0to100"].astype(float)
+        blended = (w_last * last_scores + w_cur * cur_scores).round(0)
+        t["OppDefenseScore0to100"] = blended
 
     # Helper flags at matchup level
     # Back-to-back: mark both games when a team plays on consecutive days
@@ -92,11 +132,19 @@ def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFr
         print(f"Missing values in merged scores: {merged_scores.isna().sum()} out of {len(merged_scores)}")
 
     # Group by team and week
+    # Aggregate by team/week. Preserve original order from the pre-sorted dataset for list-like fields.
     grp = t.groupby(["team", "week"], as_index=False).agg(
         Games=("opponent", "count"),
         LiteNite=("is_light_night", "sum"),
         SOS=("OppDefenseScore0to100", "mean"),
         Opponents=("opponent", lambda s: ", ".join(list(s))),
+        # Build a bracketed, comma-separated list of per-opponent ease values aligned with Opponents order
+        OppEaseList=(
+            "OppDefenseScore0to100",
+            lambda s: "[" + ",".join(
+                str(int(round(float(v)))) if pd.notna(v) else "50" for v in list(s)
+            ) + "]",
+        ),
     )
 
     # Weekly B2B and Away counts
@@ -154,7 +202,8 @@ def to_lookup_table(matchups: pd.DataFrame, opp_ease: pd.DataFrame) -> pd.DataFr
             return "Average"
         return "Difficult"
 
-    grp["MatchUp"] = grp["SOS"].map(tier_from_score)
+    # Create tier label and append the ordered per-opponent ease list, e.g., "Excellent [15,6,48]"
+    grp["MatchUp"] = grp["SOS"].map(tier_from_score) + " " + grp["OppEaseList"].astype(str)
     grp["TM"] = grp["team"].astype(str)  # Keep the NST 3-letter code
     grp["Week"] = grp["week"].astype(int)
     grp["Key"] = grp["TM"] + grp["Week"].astype(str)

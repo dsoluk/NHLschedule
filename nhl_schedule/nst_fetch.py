@@ -21,8 +21,9 @@ FEATURE_MAP = {
 }
 
 
-def _cache_file(key: str) -> Path:
-    return CACHE_DIR / f"nst_{key}_{SEASON_LABEL}.parquet"
+def _cache_file(key: str, season_label: str | None = None) -> Path:
+    season = season_label or SEASON_LABEL
+    return CACHE_DIR / f"nst_{key}_{season}.parquet"
 
 
 def _read_html_table(url: str, params: dict) -> pd.DataFrame:
@@ -107,14 +108,14 @@ def _normalize_cols(df: pd.DataFrame) -> pd.DataFrame:
     return renamed
 
 
-def fetch_team_table(sit: str, loc: str | None = None) -> pd.DataFrame:
+def fetch_team_table(sit: str, loc: str | None = None, *, season_label: str | None = None) -> pd.DataFrame:
     """Fetch a team table for given situation.
 
     sit examples: 'sva' (5v5 score & venue adjusted), 'pp', 'pk'
     loc: 'B' both, 'H' home, 'A' away. For sva we use 'B'.
     """
     key = f"team_{sit}_{loc or 'NA'}"
-    fp = _cache_file(key)
+    fp = _cache_file(key, season_label)
 
     # Check if we want to force refresh by setting refresh days to 0 or via global flag
     force_refresh = (CACHE_REFRESH_DAYS <= 0) or FORCE_CACHE_REFRESH
@@ -138,8 +139,8 @@ def fetch_team_table(sit: str, loc: str | None = None) -> pd.DataFrame:
 
     # Additional parameters based on the URL you provided
     params = dict(
-        fromseason=SEASON_LABEL,
-        thruseason=SEASON_LABEL,
+        fromseason=(season_label or SEASON_LABEL),
+        thruseason=(season_label or SEASON_LABEL),
         stype=2,  # regular season
         sit=sit,
         score="all",
@@ -153,7 +154,7 @@ def fetch_team_table(sit: str, loc: str | None = None) -> pd.DataFrame:
         params["loc"] = loc
 
     try:
-        print(f"Fetching NST data for {sit} situation, location: {loc or 'default'}")
+        print(f"Fetching NST data for {sit} situation, location: {loc or 'default'}, season={season_label or SEASON_LABEL}")
         raw = _read_html_table(TEAMTABLE_URL, params)
         df = _normalize_cols(raw)
 
@@ -240,23 +241,23 @@ def fetch_team_table(sit: str, loc: str | None = None) -> pd.DataFrame:
         return pd.DataFrame(columns=["team"] + list(FEATURE_MAP.values()))
 
 
-def get_all_situations() -> dict[str, pd.DataFrame]:
+def get_all_situations(*, season_label: str | None = None) -> dict[str, pd.DataFrame]:
     """Return dict with keys 'sva', 'pp', 'pk' dataframes.
 
     Always attempts to fetch real NST data. Falls back to empty frames on errors (neutral handling downstream).
     """
     try:
-        sva = fetch_team_table("sva", loc="B")
+        sva = fetch_team_table("sva", loc="B", season_label=season_label)
     except Exception as e:
         print(f"ERROR fetching SVA data: {e}")
         sva = pd.DataFrame(columns=["team"] + list(FEATURE_MAP.values()))
     try:
-        pp = fetch_team_table("pp")
+        pp = fetch_team_table("pp", season_label=season_label)
     except Exception as e:
         print(f"ERROR fetching PP data: {e}")
         pp = pd.DataFrame(columns=["team"] + list(FEATURE_MAP.values()))
     try:
-        pk = fetch_team_table("pk")
+        pk = fetch_team_table("pk", season_label=season_label)
     except Exception as e:
         print(f"ERROR fetching PK data: {e}")
         pk = pd.DataFrame(columns=["team"] + list(FEATURE_MAP.values()))
