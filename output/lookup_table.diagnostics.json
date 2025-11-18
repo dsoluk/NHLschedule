@@ -1,23 +1,23 @@
 {
   "opponent_ease": {
     "n": 32,
-    "mean": 52.6875,
-    "std": 26.554704738520442,
-    "dagostino_k2_stat": 7.085708502957128,
-    "dagostino_k2_p": 0.028930633820297265,
-    "shapiro_stat": 0.9430228271605084,
-    "shapiro_p": 0.0912400409704225,
+    "mean": 53.0625,
+    "std": 26.258257629743827,
+    "dagostino_k2_stat": 10.80040185008502,
+    "dagostino_k2_p": 0.004515673539557826,
+    "shapiro_stat": 0.923047422792217,
+    "shapiro_p": 0.025169514473403626,
     "is_normal_alpha_0.05": false,
     "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_Opponent_Ease_0_100.png"
   },
   "teamweek_sos": {
     "n": 768,
-    "mean": 52.127604166666664,
-    "std": 17.15969321821681,
-    "dagostino_k2_stat": 3.9107127636927497,
-    "dagostino_k2_p": 0.14151403467339285,
-    "shapiro_stat": 0.9938729084507272,
-    "shapiro_p": 0.003236332750794482,
+    "mean": 54.977864583333336,
+    "std": 13.854650227991888,
+    "dagostino_k2_stat": 24.099150222580402,
+    "dagostino_k2_p": 5.847039394181421e-06,
+    "shapiro_stat": 0.9868555017484408,
+    "shapiro_p": 2.191067420897805e-06,
     "is_normal_alpha_0.05": false,
     "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_TeamWeek_SOS_0_100.png"
   },
@@ -26,94 +26,94 @@
       "per_feature": {
         "xga60": {
           "n": 32,
-          "mean": 2.5684375,
-          "std": 0.2679098422860758,
-          "dagostino_k2_stat": 2.5542378446332057,
-          "dagostino_k2_p": 0.2788395025630831,
-          "shapiro_stat": 0.9562170647737575,
-          "shapiro_p": 0.2158373459169048,
+          "mean": 2.55875,
+          "std": 0.2623541261348866,
+          "dagostino_k2_stat": 1.9097666200750725,
+          "dagostino_k2_p": 0.38485705088769034,
+          "shapiro_stat": 0.9651145221568752,
+          "shapiro_p": 0.37648712532229933,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_sva_xga60.png"
         },
         "sca60": {
           "n": 32,
-          "mean": 26.2890625,
-          "std": 2.6615354583574025,
-          "dagostino_k2_stat": 1.5472128392006195,
-          "dagostino_k2_p": 0.46134625632476234,
-          "shapiro_stat": 0.9675680150334002,
-          "shapiro_p": 0.435130237361419,
+          "mean": 26.2459375,
+          "std": 2.539410437698827,
+          "dagostino_k2_stat": 4.623135013826255,
+          "dagostino_k2_p": 0.09910578074424284,
+          "shapiro_stat": 0.9536665423182684,
+          "shapiro_p": 0.18303166920393166,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_sva_sca60.png"
         },
         "hdca60": {
           "n": 32,
-          "mean": 11.1365625,
-          "std": 1.526013207214718,
-          "dagostino_k2_stat": 0.9880428803793788,
-          "dagostino_k2_p": 0.610167700839189,
-          "shapiro_stat": 0.9729450177808879,
-          "shapiro_p": 0.5843344286642869,
+          "mean": 11.019375,
+          "std": 1.507000202181473,
+          "dagostino_k2_stat": 0.9579566712310775,
+          "dagostino_k2_p": 0.6194159038117218,
+          "shapiro_stat": 0.9840690412887554,
+          "shapiro_p": 0.9053160550756574,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_sva_hdca60.png"
         },
         "ga60": {
           "n": 32,
-          "mean": 2.470625,
-          "std": 0.38192716501317364,
-          "dagostino_k2_stat": 1.7866263198244914,
-          "dagostino_k2_p": 0.4092974359774597,
-          "shapiro_stat": 0.98220925628733,
-          "shapiro_p": 0.860647575755763,
+          "mean": 2.45875,
+          "std": 0.41271774555984386,
+          "dagostino_k2_stat": 0.8895278439344483,
+          "dagostino_k2_p": 0.6409755784256426,
+          "shapiro_stat": 0.9828535304658701,
+          "shapiro_p": 0.8769365555109956,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_sva_ga60.png"
         },
         "sa60": {
           "n": 32,
-          "mean": 26.661250000000003,
-          "std": 2.346604927869197,
-          "dagostino_k2_stat": 6.467830699578013,
-          "dagostino_k2_p": 0.03940292015604541,
-          "shapiro_stat": 0.9471243603399694,
-          "shapiro_p": 0.11938537187338372,
-          "is_normal_alpha_0.05": false,
+          "mean": 26.39125,
+          "std": 2.3978333318852667,
+          "dagostino_k2_stat": 4.669014302214507,
+          "dagostino_k2_p": 0.09685820722514601,
+          "shapiro_stat": 0.9435757443813908,
+          "shapiro_p": 0.09460605285478077,
+          "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_sva_sa60.png"
         }
       },
       "correlation": {
         "xga60": {
           "xga60": 1.0,
-          "sca60": 0.904,
-          "hdca60": 0.904,
-          "ga60": 0.179,
-          "sa60": 0.721
+          "sca60": 0.915,
+          "hdca60": 0.91,
+          "ga60": 0.224,
+          "sa60": 0.74
         },
         "sca60": {
-          "xga60": 0.904,
+          "xga60": 0.915,
           "sca60": 1.0,
-          "hdca60": 0.845,
-          "ga60": 0.201,
-          "sa60": 0.618
+          "hdca60": 0.864,
+          "ga60": 0.234,
+          "sa60": 0.658
         },
         "hdca60": {
-          "xga60": 0.904,
-          "sca60": 0.845,
+          "xga60": 0.91,
+          "sca60": 0.864,
           "hdca60": 1.0,
-          "ga60": 0.207,
-          "sa60": 0.649
+          "ga60": 0.212,
+          "sa60": 0.659
         },
         "ga60": {
-          "xga60": 0.179,
-          "sca60": 0.201,
-          "hdca60": 0.207,
+          "xga60": 0.224,
+          "sca60": 0.234,
+          "hdca60": 0.212,
           "ga60": 1.0,
-          "sa60": 0.212
+          "sa60": 0.187
         },
         "sa60": {
-          "xga60": 0.721,
-          "sca60": 0.618,
-          "hdca60": 0.649,
-          "ga60": 0.212,
+          "xga60": 0.74,
+          "sca60": 0.658,
+          "hdca60": 0.659,
+          "ga60": 0.187,
           "sa60": 1.0
         }
       },
@@ -122,17 +122,17 @@
         {
           "feature_a": "xga60",
           "feature_b": "sca60",
-          "pearson_r": 0.9041094781697953
+          "pearson_r": 0.9154444432656172
         },
         {
           "feature_a": "xga60",
           "feature_b": "hdca60",
-          "pearson_r": 0.9037385397502898
+          "pearson_r": 0.9102582216951057
         },
         {
           "feature_a": "sca60",
           "feature_b": "hdca60",
-          "pearson_r": 0.844741494953561
+          "pearson_r": 0.8641895103776319
         }
       ]
     },
@@ -140,94 +140,94 @@
       "per_feature": {
         "xga60": {
           "n": 32,
-          "mean": 0.9296875,
-          "std": 0.3932594911044741,
-          "dagostino_k2_stat": 6.2801042424124525,
-          "dagostino_k2_p": 0.043280542009120834,
-          "shapiro_stat": 0.9179823376702148,
-          "shapiro_p": 0.018335591306501517,
-          "is_normal_alpha_0.05": false,
+          "mean": 0.9237500000000001,
+          "std": 0.3822364287976749,
+          "dagostino_k2_stat": 2.2041020230649555,
+          "dagostino_k2_p": 0.3321890609239597,
+          "shapiro_stat": 0.9569318730213141,
+          "shapiro_p": 0.22597848351640487,
+          "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pp_xga60.png"
         },
         "sca60": {
           "n": 32,
-          "mean": 6.8034375,
-          "std": 2.425769992928792,
-          "dagostino_k2_stat": 0.2755562197190773,
-          "dagostino_k2_p": 0.8712920014028258,
-          "shapiro_stat": 0.9865719895730974,
-          "shapiro_p": 0.9522708253671038,
+          "mean": 6.6899999999999995,
+          "std": 2.4346008399735672,
+          "dagostino_k2_stat": 0.7242610119144242,
+          "dagostino_k2_p": 0.6961915047740805,
+          "shapiro_stat": 0.9705921437881977,
+          "shapiro_p": 0.5159042900518833,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pp_sca60.png"
         },
         "hdca60": {
           "n": 32,
-          "mean": 2.8534375,
-          "std": 1.1289530807760568,
-          "dagostino_k2_stat": 1.613713305994356,
-          "dagostino_k2_p": 0.4462586095357093,
-          "shapiro_stat": 0.9718817274899494,
-          "shapiro_p": 0.5528908780868371,
+          "mean": 2.796875,
+          "std": 1.0602489020862036,
+          "dagostino_k2_stat": 0.5296821612938504,
+          "dagostino_k2_p": 0.7673278835376458,
+          "shapiro_stat": 0.9811954783397898,
+          "shapiro_p": 0.8335238026712959,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pp_hdca60.png"
         },
         "ga60": {
           "n": 32,
-          "mean": 0.9156249999999999,
-          "std": 0.7037352906988535,
-          "dagostino_k2_stat": 1.7155000267290585,
-          "dagostino_k2_p": 0.42411526326768245,
-          "shapiro_stat": 0.920350336450441,
-          "shapiro_p": 0.02125022125311831,
-          "is_normal_alpha_0.05": false,
+          "mean": 0.9059375000000001,
+          "std": 0.6413699175154304,
+          "dagostino_k2_stat": 0.45559556395168466,
+          "dagostino_k2_p": 0.796285266788967,
+          "shapiro_stat": 0.9433235420930859,
+          "shapiro_p": 0.09305545152719988,
+          "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pp_ga60.png"
         },
         "sa60": {
           "n": 32,
-          "mean": 9.47875,
-          "std": 2.7033853198351134,
-          "dagostino_k2_stat": 5.706313500134899,
-          "dagostino_k2_p": 0.05766200871936591,
-          "shapiro_stat": 0.9530382236640556,
-          "shapiro_p": 0.17571096762812777,
-          "is_normal_alpha_0.05": true,
+          "mean": 9.371875,
+          "std": 2.5898098838283476,
+          "dagostino_k2_stat": 9.091610862873727,
+          "dagostino_k2_p": 0.010611622339115185,
+          "shapiro_stat": 0.932718405854624,
+          "shapiro_p": 0.046648048331772635,
+          "is_normal_alpha_0.05": false,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pp_sa60.png"
         }
       },
       "correlation": {
         "xga60": {
           "xga60": 1.0,
-          "sca60": 0.7,
-          "hdca60": 0.557,
-          "ga60": 0.445,
-          "sa60": 0.661
+          "sca60": 0.704,
+          "hdca60": 0.61,
+          "ga60": 0.516,
+          "sa60": 0.73
         },
         "sca60": {
-          "xga60": 0.7,
+          "xga60": 0.704,
           "sca60": 1.0,
-          "hdca60": 0.553,
-          "ga60": 0.378,
-          "sa60": 0.58
+          "hdca60": 0.63,
+          "ga60": 0.481,
+          "sa60": 0.677
         },
         "hdca60": {
-          "xga60": 0.557,
-          "sca60": 0.553,
+          "xga60": 0.61,
+          "sca60": 0.63,
           "hdca60": 1.0,
-          "ga60": 0.236,
-          "sa60": 0.478
+          "ga60": 0.402,
+          "sa60": 0.577
         },
         "ga60": {
-          "xga60": 0.445,
-          "sca60": 0.378,
-          "hdca60": 0.236,
+          "xga60": 0.516,
+          "sca60": 0.481,
+          "hdca60": 0.402,
           "ga60": 1.0,
-          "sa60": 0.522
+          "sa60": 0.617
         },
         "sa60": {
-          "xga60": 0.661,
-          "sca60": 0.58,
-          "hdca60": 0.478,
-          "ga60": 0.522,
+          "xga60": 0.73,
+          "sca60": 0.677,
+          "hdca60": 0.577,
+          "ga60": 0.617,
           "sa60": 1.0
         }
       },
@@ -238,56 +238,56 @@
       "per_feature": {
         "xga60": {
           "n": 32,
-          "mean": 8.9003125,
-          "std": 1.6145906686661327,
-          "dagostino_k2_stat": 2.5235502075309486,
-          "dagostino_k2_p": 0.28315095780090666,
-          "shapiro_stat": 0.9544024463487066,
-          "shapiro_p": 0.19197679452510075,
+          "mean": 8.85625,
+          "std": 1.5698920145984563,
+          "dagostino_k2_stat": 2.524969718812642,
+          "dagostino_k2_p": 0.28295006111360843,
+          "shapiro_stat": 0.9451971188320981,
+          "shapiro_p": 0.10521475699452681,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pk_xga60.png"
         },
         "sca60": {
           "n": 32,
-          "mean": 60.24,
-          "std": 8.938667406274831,
-          "dagostino_k2_stat": 2.214293568422318,
-          "dagostino_k2_p": 0.3305006066264445,
-          "shapiro_stat": 0.9571425884001363,
-          "shapiro_p": 0.22905137503552708,
+          "mean": 60.2609375,
+          "std": 8.557551621000819,
+          "dagostino_k2_stat": 1.8032737768888556,
+          "dagostino_k2_p": 0.40590469494778303,
+          "shapiro_stat": 0.9665457429492024,
+          "shapiro_p": 0.40991888746149324,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pk_sca60.png"
         },
         "hdca60": {
           "n": 32,
-          "mean": 26.9596875,
-          "std": 6.661355194503874,
-          "dagostino_k2_stat": 0.5016130256270755,
-          "dagostino_k2_p": 0.7781729234830994,
-          "shapiro_stat": 0.9794811334128259,
-          "shapiro_p": 0.7843765384779785,
+          "mean": 26.3821875,
+          "std": 6.324466743516306,
+          "dagostino_k2_stat": 0.7653561702587989,
+          "dagostino_k2_p": 0.6820324203288864,
+          "shapiro_stat": 0.9820818082044981,
+          "shapiro_p": 0.8573332297726476,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pk_hdca60.png"
         },
         "ga60": {
           "n": 32,
-          "mean": 7.7425,
-          "std": 2.4163156354251405,
-          "dagostino_k2_stat": 0.49966458520706547,
-          "dagostino_k2_p": 0.7789314046758988,
-          "shapiro_stat": 0.9767691777064151,
-          "shapiro_p": 0.7017210119876033,
+          "mean": 7.61625,
+          "std": 2.276968585092908,
+          "dagostino_k2_stat": 0.9916658647998228,
+          "dagostino_k2_p": 0.6090633873318319,
+          "shapiro_stat": 0.9697230511807127,
+          "shapiro_p": 0.49178796012555415,
           "is_normal_alpha_0.05": true,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pk_ga60.png"
         },
         "sa60": {
           "n": 32,
-          "mean": 53.292187500000004,
-          "std": 6.894688505642859,
-          "dagostino_k2_stat": 6.565545573346778,
-          "dagostino_k2_p": 0.037524066194084583,
-          "shapiro_stat": 0.8855249591601995,
-          "shapiro_p": 0.002704699153858865,
+          "mean": 53.4175,
+          "std": 6.9810502433373145,
+          "dagostino_k2_stat": 4.59476626452407,
+          "dagostino_k2_p": 0.10052155144214678,
+          "shapiro_stat": 0.8989135380683675,
+          "shapiro_p": 0.00581174159778733,
           "is_normal_alpha_0.05": false,
           "plot_path": "C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\_plots\\normality_pk_sa60.png"
         }
@@ -295,37 +295,37 @@
       "correlation": {
         "xga60": {
           "xga60": 1.0,
-          "sca60": 0.775,
-          "hdca60": 0.909,
-          "ga60": 0.173,
-          "sa60": 0.784
+          "sca60": 0.786,
+          "hdca60": 0.907,
+          "ga60": 0.094,
+          "sa60": 0.783
         },
         "sca60": {
-          "xga60": 0.775,
+          "xga60": 0.786,
           "sca60": 1.0,
-          "hdca60": 0.707,
-          "ga60": 0.114,
-          "sa60": 0.696
+          "hdca60": 0.698,
+          "ga60": 0.069,
+          "sa60": 0.692
         },
         "hdca60": {
-          "xga60": 0.909,
-          "sca60": 0.707,
+          "xga60": 0.907,
+          "sca60": 0.698,
           "hdca60": 1.0,
-          "ga60": 0.121,
-          "sa60": 0.711
+          "ga60": 0.057,
+          "sa60": 0.677
         },
         "ga60": {
-          "xga60": 0.173,
-          "sca60": 0.114,
-          "hdca60": 0.121,
+          "xga60": 0.094,
+          "sca60": 0.069,
+          "hdca60": 0.057,
           "ga60": 1.0,
-          "sa60": 0.196
+          "sa60": 0.14
         },
         "sa60": {
-          "xga60": 0.784,
-          "sca60": 0.696,
-          "hdca60": 0.711,
-          "ga60": 0.196,
+          "xga60": 0.783,
+          "sca60": 0.692,
+          "hdca60": 0.677,
+          "ga60": 0.14,
           "sa60": 1.0
         }
       },
@@ -334,7 +334,7 @@
         {
           "feature_a": "xga60",
           "feature_b": "hdca60",
-          "pearson_r": 0.9090297383085469
+          "pearson_r": 0.9068536686690775
         }
       ]
     }
