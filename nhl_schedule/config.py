@@ -44,6 +44,16 @@ FEATURE_WEIGHTS = {  # higher against numbers -> tougher defense; we invert late
     "sa60": 0.10,
 }
 
+# Offense metric feature weights (For rates). We'll start by mirroring the
+# same distribution used for defense, but on "for" metrics.
+OFFENSE_FEATURE_WEIGHTS = {
+    "xgf60": 0.35,
+    "scf60": 0.20,
+    "hdcf60": 0.20,
+    "gf60": 0.15,
+    "sf60": 0.10,
+}
+
 # Caching
 CACHE_DIR = Path.cwd() / "_cache"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)

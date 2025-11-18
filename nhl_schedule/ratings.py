@@ -1,7 +1,7 @@
 from __future__ import annotations
 import numpy as np
 import pandas as pd
-from .config import FEATURE_WEIGHTS, SITUATION_WEIGHTS
+from .config import FEATURE_WEIGHTS, SITUATION_WEIGHTS, OFFENSE_FEATURE_WEIGHTS
 
 # Tier mapping per user categories
 # 0-30 = Excellent, 31-50 = Good, 51-70 = Average, 71-100 = Difficult
@@ -171,4 +171,102 @@ def build_combined_ease(situ_dfs: dict[str, pd.DataFrame]) -> pd.DataFrame:
     print(f"OppDefenseScore0to100 values: {out['OppDefenseScore0to100'].tolist()}")
     print(f"OppDefenseTier distribution: {out['OppDefenseTier'].value_counts().to_dict()}")
 
+    return out
+
+
+def _score_from_offense(df_off: pd.DataFrame) -> pd.DataFrame:
+    """Compute 0–100 offensive strength score from 'for' metrics.
+
+    Input columns: team + OFFENSE_FEATURE_WEIGHTS keys
+    Higher 'for' rates => stronger offense (no sign flip), then scaled to 0–100 via 5–95 pct bounds.
+    """
+    print(f"_score_from_offense input: {len(df_off) if df_off is not None else 0} rows")
+    if df_off is None or len(df_off) == 0:
+        return pd.DataFrame({"team": [], "off_score": []})
+
+    required = ["team"] + list(OFFENSE_FEATURE_WEIGHTS.keys())
+    missing = [c for c in required if c not in df_off.columns]
+    if missing:
+        print(f"WARNING: Missing offense columns: {missing}")
+        teams = pd.Index(df_off.get("team", pd.Series([], dtype=str))).astype(str)
+        return pd.DataFrame({"team": teams, "off_score": np.full(len(teams), 50.0)})
+
+    df = df_off[required].copy()
+    df = df.dropna(subset=OFFENSE_FEATURE_WEIGHTS.keys())
+    if len(df) < 3:
+        teams = pd.Index(df_off["team"].astype(str)).unique()
+        return pd.DataFrame({"team": teams, "off_score": np.full(len(teams), 50.0)})
+
+    # Z-scores
+    for col in OFFENSE_FEATURE_WEIGHTS:
+        mu = df[col].mean()
+        sigma = df[col].std(ddof=0)
+        if not np.isfinite(sigma) or sigma == 0:
+            z = pd.Series(0.0, index=df.index)
+        else:
+            z = (df[col] - mu) / sigma
+        df[col + "_z"] = z
+
+    composite = sum(OFFENSE_FEATURE_WEIGHTS[c] * df[c + "_z"] for c in OFFENSE_FEATURE_WEIGHTS)
+    vals = composite.to_numpy()
+    vals = vals[np.isfinite(vals)]
+    if vals.size == 0:
+        teams = pd.Index(df["team"].astype(str)).unique()
+        return pd.DataFrame({"team": teams, "off_score": np.full(len(teams), 50.0)})
+
+    q5, q95 = np.nanpercentile(vals, [5, 95])
+    if not np.isfinite(q5) or not np.isfinite(q95) or q95 == q5:
+        score = np.full(len(composite), 50.0)
+    else:
+        score = 100 * (composite - q5) / (q95 - q5)
+        score = np.clip(score, 0, 100)
+
+    out = df[["team"]].copy()
+    out["off_score"] = score
+    return out
+
+
+def build_combined_offense(situ_dfs: dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Combine situation-specific offense scores into a single Opponent Offense 0–100.
+
+    Uses the same situation weights as defense: SVA heavy, PP and PK lighter. For PK, we still
+    use the team table which includes For rates for the team while shorthanded (not directly meaningful for
+    offense), so we reduce its effect implicitly through weights; user can later adjust SITUATION_WEIGHTS.
+    """
+    print("Building combined offense scores from situation dataframes")
+    parts = {}
+    for key, df in situ_dfs.items():
+        parts[key] = _score_from_offense(df).rename(columns={"off_score": f"off_{key}"})
+
+    team_sets = [p["team"] for p in parts.values() if "team" in p and len(p) > 0]
+    if not team_sets:
+        return pd.DataFrame({"team": [], "OppOffenseScore0to100": [], "OppOffenseTier": []})
+
+    base = pd.DataFrame({"team": pd.Index(pd.concat(team_sets)).unique()})
+    for key in parts:
+        if len(parts[key]) > 0:
+            base = base.merge(parts[key], on="team", how="left")
+
+    off_cols = [c for c in base.columns if c.startswith("off_")]
+    for c in off_cols:
+        col_mean = pd.to_numeric(base[c], errors="coerce").mean()
+        fill_value = float(col_mean) if np.isfinite(col_mean) else 50.0
+        base[c] = pd.to_numeric(base[c], errors="coerce").fillna(fill_value)
+
+    w_sva = SITUATION_WEIGHTS.get("sva", 0.75)
+    w_pp = SITUATION_WEIGHTS.get("pp", 0.10)
+    w_pk = SITUATION_WEIGHTS.get("pk", 0.10)
+    total_w = max(w_sva + w_pp + w_pk, 1e-9)
+    w_sva, w_pp, w_pk = [w / total_w for w in (w_sva, w_pp, w_pk)]
+
+    combined = (
+        w_sva * base.get("off_sva", 50.0)
+        + w_pp * base.get("off_pp", 50.0)
+        + w_pk * base.get("off_pk", 50.0)
+    )
+    combined = np.clip(combined, 0, 100)
+
+    out = base[["team"]].copy()
+    out["OppOffenseScore0to100"] = np.rint(combined).astype(int)
+    out["OppOffenseTier"] = pd.cut(out["OppOffenseScore0to100"], bins=TIER_BINS, labels=TIER_LABELS)
     return out

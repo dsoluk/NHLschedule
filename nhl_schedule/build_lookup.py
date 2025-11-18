@@ -13,8 +13,8 @@ from .config import (
 from .schedule_io import read_schedule
 from .nst_fetch import get_all_situations
 from . import nst_fetch as nst_mod
-from .ratings import build_combined_ease
-from .export import to_lookup_table, write_outputs
+from .ratings import build_combined_ease, build_combined_offense
+from .export import to_lookup_table, write_outputs, to_offense_lookup_table
 from .diagnostics import normality_report, features_diagnostics
 from .config import SAVE_PLOTS, PLOTS_DIR
 from .config import SEASON_LABEL, OUTPUT_DIR
@@ -75,6 +75,20 @@ def build(schedule_path: str | None = None, sheet_or_table: str | None = None,
     print("Writing outputs...")
     write_outputs(lookup, csv_path=out_csv, xlsx_path=None)  # user prefers CSV for Power Query
 
+    # 5a) Build Opponent Offense scores and weekly offense matchup lookup
+    print("Building Opponent Offense scores (0-100)...")
+    opp_off = build_combined_offense(situ)
+    opp_off_last = None
+    if include_last_season and situ_last is not None:
+        print("Building last-season Opponent Offense...")
+        opp_off_last = build_combined_offense(situ_last)
+
+    print("Building weekly Opponent Offense lookup table...")
+    offense_lookup = to_offense_lookup_table(matchups, opp_off, opp_off_last=opp_off_last, weeks=weeks)
+    off_lookup_path = str(Path(out_csv).with_name("opponent_offense_lookup.csv"))
+    offense_lookup.to_csv(off_lookup_path, index=False)
+    print(f"Opponent Offense lookup written to: {off_lookup_path}")
+
     # 5b) Additional Team->Score (Team Defense) lookup for library use
     try:
         # Team Defense tiers for goalie evaluation (opposite labels vs skater ease)
@@ -115,6 +129,27 @@ def build(schedule_path: str | None = None, sheet_or_table: str | None = None,
         opp_lookup.to_csv(opp_lookup_path, index=False)
         print(f"Team Defense lookup written to: {opp_lookup_path}")
 
+        # Team Offense lookup (Team -> OppOffenseScore0to100 and TIER)
+        def _tier_from_score_off(val: float | int) -> str:
+            try:
+                v = float(val)
+            except Exception:
+                v = 50.0
+            if v <= TEAM_DEF_TIER_BINS[1]:
+                return TEAM_DEF_TIER_LABELS[0]
+            if v <= TEAM_DEF_TIER_BINS[2]:
+                return TEAM_DEF_TIER_LABELS[1]
+            if v <= TEAM_DEF_TIER_BINS[3]:
+                return TEAM_DEF_TIER_LABELS[2]
+            return TEAM_DEF_TIER_LABELS[3]
+
+        team_off_lookup = opp_off.rename(columns={"team": "Team", "OppOffenseScore0to100": "Score"})[["Team", "Score"]].copy()
+        team_off_lookup["TIER"] = team_off_lookup["Score"].map(_tier_from_score_off)
+        team_off_lookup["Team"] = team_off_lookup["Team"].map(_to_nst_dotted)
+        team_off_lookup_path = str(Path(out_csv).with_name("team_offense_lookup.csv"))
+        team_off_lookup.to_csv(team_off_lookup_path, index=False)
+        print(f"Team Offense lookup written to: {team_off_lookup_path}")
+
         # Generate plots: xga60 and ga60 vs Team Defense score (using SVA situation)
         if SAVE_PLOTS and "sva" in situ:
             try:
@@ -151,7 +186,8 @@ def build(schedule_path: str | None = None, sheet_or_table: str | None = None,
     print("Generating diagnostics...")
     # Feature diagnostics for each situation (current season)
     feature_cols = [
-        "xga60", "sca60", "hdca60", "ga60", "sa60"
+        "xga60", "sca60", "hdca60", "ga60", "sa60",
+        "xgf60", "scf60", "hdcf60", "gf60", "sf60",
     ]
     feature_diag = {
         k: features_diagnostics(df, feature_cols, label_prefix=f"{k}") for k, df in situ.items()
@@ -159,6 +195,7 @@ def build(schedule_path: str | None = None, sheet_or_table: str | None = None,
 
     diag = {
         "opponent_ease": normality_report(opp_ease["OppDefenseScore0to100"], label="Opponent_Ease_0_100"),
+        "opponent_offense": normality_report(opp_off["OppOffenseScore0to100"], label="Opponent_Offense_0_100"),
         "teamweek_sos": normality_report(lookup["SOS"].str.rstrip('%').astype(float), label="TeamWeek_SOS_0_100"),
         "features": feature_diag,
     }

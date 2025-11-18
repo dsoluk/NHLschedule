@@ -12,12 +12,22 @@ FORCE_CACHE_REFRESH = False
 TEAMTABLE_URL = "https://www.naturalstattrick.com/teamtable.php"
 
 # Common columns we need from NST team table
+# Include both Against and For versions so downstream can compute
+# defensive (against) and offensive (for) scores from the same fetch.
 FEATURE_MAP = {
+    # Against (defense faced by skaters, goalie-friendly)
     "xGA/60": "xga60",
     "SCA/60": "sca60",
     "HDCA/60": "hdca60",
     "SA/60": "sa60",
     "GA/60": "ga60",
+
+    # For (team offensive generation rates)
+    "xGF/60": "xgf60",
+    "SCF/60": "scf60",
+    "HDCF/60": "hdcf60",
+    "SF/60": "sf60",
+    "GF/60": "gf60",
 }
 
 
@@ -70,11 +80,18 @@ def _normalize_cols(df: pd.DataFrame) -> pd.DataFrame:
 
         # Try alternate column names that NST might use
         alternate_names = {
+            # Against
             "xGA/60": ["xGA60", "xGA"],
             "SCA/60": ["SCA60", "SCA"],
             "HDCA/60": ["HDCA60", "HDCA"],
             "SA/60": ["SA60", "SA"],
-            "GA/60": ["GA60", "GA"]
+            "GA/60": ["GA60", "GA"],
+            # For
+            "xGF/60": ["xGF60", "xGF"],
+            "SCF/60": ["SCF60", "SCF"],
+            "HDCF/60": ["HDCF60", "HDCF"],
+            "SF/60": ["SF60", "SF"],
+            "GF/60": ["GF60", "GF"],
         }
 
         for col in missing[:]:

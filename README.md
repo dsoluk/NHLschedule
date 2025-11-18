@@ -2,9 +2,11 @@ NHLschedule
 
 Overview
 - This repository builds an NHL schedule “lookup table” that blends team schedule information with Natural Stat Trick (NST) team metrics (5v5 SVA, Power Play, Penalty Kill) to produce:
-  - output/lookup_table.csv — a team-week table with Schedule Strength (SOS) and related fields suitable for Excel/Power Query or downstream analytics.
+  - output/lookup_table.csv — a team-week table with Opponent Defense strength (SOS) and related fields suitable for Excel/Power Query or downstream analytics.
+  - output/opponent_offense_lookup.csv — a parallel team-week table focusing on the opponent’s Offense matchup per week.
   - output/lookup_table.diagnostics.json — normality checks and feature diagnostics for transparency.
-  - opponent_ease_lookup.csv — a simple Team → Opponent Defense score (0–100) mapping for quick consumption in other projects.
+  - output/team_defense_lookup.csv — simple Team → Opponent Defense score (0–100) mapping for quick consumption.
+  - output/team_offense_lookup.csv — simple Team → Opponent Offense score (0–100) mapping.
 
 You can run this project as a standalone CLI or import it from another project (for example, NSTstats) as a small library.
 
@@ -52,13 +54,15 @@ Flags (all optional unless your setup differs from defaults):
 - --out_csv: Where to write the CSV (defaults to config.OUTPUT_CSV).
 - --out_xlsx: Optional XLSX output path (CSV is primary and preferred for Power Query).
 - --refresh-cache: Refetch NST team tables even if cached locally.
-- --include-last-season: Blend prior season opponent-ease into early weeks for stability.
+- --include-last-season: Blend prior season scores (defense and offense) into early weeks for stability.
 - --weeks: Number of regular-season weeks to consider for blending scale (default 25).
 
 Outputs
-- output/lookup_table.csv — primary deliverable
+- output/lookup_table.csv — primary deliverable (Defense-facing SOS and weekly matchup tiers)
+- output/opponent_offense_lookup.csv — weekly Opponent Offense matchup per team/week
 - output/lookup_table.diagnostics.json — diagnostic JSON
-- opponent_ease_lookup.csv — simple lookup written next to the out_csv
+- output/team_defense_lookup.csv — per-Team Opponent Defense score and tier
+- output/team_offense_lookup.csv — per-Team Opponent Offense score and tier
 - _plots/*.png — normality plots produced during diagnostics
 
 
@@ -78,7 +82,9 @@ You can call the build() function to produce outputs programmatically:
   )
   print("Wrote:", out_csv_path)
 
-The function returns the path to the written CSV. It also emits opponent_ease_lookup.csv next to out_csv.
+The function returns the path to the written CSV. It also emits:
+- opponent_offense_lookup.csv next to out_csv (weekly offense matchup table)
+- team_defense_lookup.csv and team_offense_lookup.csv (simple per-Team score maps)
 
 
 Integrating with the NSTstats project
@@ -101,10 +107,19 @@ There are two common ways to integrate:
        from pathlib import Path
        opp_lookup = pd.read_csv(Path(csv_path).with_name("opponent_ease_lookup.csv"))
 
-   - Alternatively, if you already have your own schedule DataFrame and want just the opponent-ease scores, explore:
+   - Alternatively, if you already have your own schedule DataFrame and want just the opponent defense/offense scores, explore:
      - nhl_schedule.nst_fetch.get_all_situations() — fetches team metrics per situation
-     - nhl_schedule.ratings.build_combined_ease() — produces per-team OppDefenseScore0to100
-     - nhl_schedule.export.to_lookup_table() — builds the full team-week table from a schedule + ease scores
+     - nhl_schedule.ratings.build_combined_ease() — produces per-team OppDefenseScore0to100 (0–100)
+     - nhl_schedule.ratings.build_combined_offense() — produces per-team OppOffenseScore0to100 (0–100)
+     - nhl_schedule.export.to_lookup_table() — builds the full team-week table from a schedule + defense scores
+     - nhl_schedule.export.to_offense_lookup_table() — builds the weekly offense matchup table from a schedule + offense scores
+
+Opponent Offense methodology
+- We mirror the Team Defense methodology but use the “For” versions of the same metrics: xGF/60, SCF/60, HDCF/60, GF/60, SF/60.
+- Each metric is standardized (z-score) across teams, then combined using weights matching defense by default:
+  xGF/60 0.35, SCF/60 0.20, HDCF/60 0.20, GF/60 0.15, SF/60 0.10.
+- The composite is scaled to 0–100 using the 5th–95th percentile window and clipped to [0, 100]. Higher means a stronger offense.
+- Situation weighting mirrors defense (config.SITUATION_WEIGHTS): SVA heavy, PP and PK lighter. You may tune these in nhl_schedule/config.py.
 
 
 Schedule input

@@ -219,3 +219,116 @@ def write_outputs(df_lookup: pd.DataFrame, csv_path: str | None = None, xlsx_pat
     if xlsx_path:
         with pd.ExcelWriter(xlsx_path, engine="xlsxwriter") as xw:
             df_lookup.to_excel(xw, index=False, sheet_name="lookup")
+
+
+def to_offense_lookup_table(matchups: pd.DataFrame, opp_off: pd.DataFrame,
+                            opp_off_last: pd.DataFrame | None = None,
+                            *, weeks: int = 25) -> pd.DataFrame:
+    """Aggregate per team/week and attach opponent OFFENSE strength (0–100).
+
+    Returns columns mirroring the defense lookup, but with offensive metrics:
+      TM, Week, Games, LiteNite, Opponents, OppOff, OffMatchUp, B2B, Away, GamesRestOfWeek, GamesROS, Key
+    - OppOff is the average OppOffenseScore0to100 as a percent string
+    - OffMatchUp maps the average score to tier and appends the per-opponent list
+    """
+    t = matchups.merge(
+        opp_off.rename(columns={"team": "opponent"}),
+        on="opponent",
+        how="left",
+    )
+
+    if opp_off_last is not None and len(opp_off_last) > 0:
+        t = t.merge(
+            opp_off_last.rename(columns={"team": "opponent", "OppOffenseScore0to100": "OppOffenseScore0to100_last"})[
+                ["opponent", "OppOffenseScore0to100_last"]
+            ],
+            on="opponent",
+            how="left",
+        )
+        denom = max(1, weeks - 1)
+        w_last = (1 - (t["week"].astype(float) - 1) / denom).clip(lower=0, upper=1)
+        w_cur = 1 - w_last
+        last_scores = t["OppOffenseScore0to100_last"].fillna(t["OppOffenseScore0to100"]).astype(float)
+        cur_scores = t["OppOffenseScore0to100"].astype(float)
+        blended = (w_last * last_scores + w_cur * cur_scores).round(0)
+        t["OppOffenseScore0to100"] = blended
+
+    # Helper flags and order, copied from defense lookup
+    t = t.sort_values(["team", "date"]).copy()
+    t["prev_date"] = t.groupby("team")["date"].shift(1)
+    t["next_date"] = t.groupby("team")["date"].shift(-1)
+    t["is_b2b"] = (
+        (pd.to_datetime(t["date"]) - pd.to_datetime(t["prev_date"]) == pd.Timedelta(days=1)) |
+        (pd.to_datetime(t["next_date"]) - pd.to_datetime(t["date"]) == pd.Timedelta(days=1))
+    )
+    t["is_b2b"] = t["is_b2b"].fillna(False)
+    t["is_away"] = ~t["is_home"].astype(bool)
+
+    today = date.today()
+    future_mask = pd.to_datetime(t["date"]).dt.date >= today
+    if future_mask.any():
+        next_date = pd.to_datetime(t.loc[future_mask, "date"]).dt.date.min()
+        cweek_series = t.loc[pd.to_datetime(t["date"]).dt.date == next_date, "week"]
+        current_week = int(cweek_series.mode().iloc[0]) if not cweek_series.empty else int(t["week"].max())
+    else:
+        current_week = int(t["week"].max())
+
+    rem_cur_week = (
+        t[(t["week"] == current_week) & (pd.to_datetime(t["date"]).dt.date >= today)]
+        .groupby("team")["opponent"].count()
+    )
+
+    grp = t.groupby(["team", "week"], as_index=False).agg(
+        Games=("opponent", "count"),
+        LiteNite=("is_light_night", "sum"),
+        OppOff=("OppOffenseScore0to100", "mean"),
+        Opponents=("opponent", lambda s: ", ".join(list(s))),
+        OppOffList=(
+            "OppOffenseScore0to100",
+            lambda s: "[" + ",".join(
+                str(int(round(float(v)))) if pd.notna(v) else "50" for v in list(s)
+            ) + "]",
+        ),
+    )
+
+    weekly_b2b = t.groupby(["team", "week"])['is_b2b'].sum().rename('B2B')
+    weekly_away = t.groupby(["team", "week"])['is_away'].sum().rename('Away')
+    grp = grp.merge(weekly_b2b, on=["team", "week"], how="left").merge(weekly_away, on=["team", "week"], how="left")
+    grp['B2B'] = grp['B2B'].fillna(0).astype(int)
+    grp['Away'] = grp['Away'].fillna(0).astype(int)
+
+    grp['GamesRestOfWeek'] = np.where(
+        grp['week'].eq(current_week),
+        grp['team'].map(rem_cur_week).fillna(0).astype(int),
+        0
+    )
+
+    grp = grp.sort_values(['team', 'week']).copy()
+    grp['GamesPlayedThrough'] = grp.groupby('team')['Games'].cumsum()
+    grp['GamesROS'] = (82 - grp['GamesPlayedThrough']).clip(lower=0).astype(int)
+    grp.drop(columns=['GamesPlayedThrough'], inplace=True)
+
+    # Format OppOff as percent string like SOS
+    grp["OppOff"] = (
+        grp["OppOff"].fillna(50).replace([float('inf'), -float('inf')], 50).round(0).astype(int)
+    ).astype(str) + "%"
+
+    def tier_from_score(s):
+        v = int(str(s).rstrip("%"))
+        if v <= 30:
+            return "Excellent"
+        if v <= 50:
+            return "Good"
+        if v <= 70:
+            return "Average"
+        return "Difficult"
+
+    grp["OffMatchUp"] = grp["OppOff"].map(tier_from_score) + " " + grp["OppOffList"].astype(str)
+    grp["TM"] = grp["team"].astype(str)
+    grp["Week"] = grp["week"].astype(int)
+    grp["Key"] = grp["TM"] + grp["Week"].astype(str)
+
+    return grp[[
+        "TM", "Week", "Games", "LiteNite", "Opponents", "OppOff", "OffMatchUp", "B2B", "Away",
+        "GamesRestOfWeek", "GamesROS", "Key"
+    ]]
