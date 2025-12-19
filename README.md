@@ -140,5 +140,15 @@ Development notes
 - Outputs go to output/ by default; plots go to _plots/; caches go to _cache/.
 
 
-License
-- Not specified. If you plan to distribute, add a LICENSE file that matches your intended usage.
+### Maintenance & Updates
+
+If you make changes to the source code and use this project as a dependency in another tool (like `NSTstats`), you need to update the installed version in that environment.
+
+**1. If you installed in "Editable" mode:**
+If you originally ran `pip install -e .`, your changes should reflect immediately without a reinstall.
+
+**2. If you installed normally:**
+Run the following from this repository's root to push your latest changes to your Python environment:
+```bash
+pip install . --upgrade
+```

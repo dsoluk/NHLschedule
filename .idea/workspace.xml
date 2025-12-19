@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a546ce8a-89e1-476a-910f-20a8b462a541" name="Changes" comment="added opp offense for goalie">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/lib/nhl_schedule/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib/nhl_schedule/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nhl_schedule/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/nhl_schedule/config.py" afterDir="false" />
+    <list default="true" id="a546ce8a-89e1-476a-910f-20a8b462a541" name="Changes" comment="changed path for AG schedule">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nhl_schedule.egg-info/SOURCES.txt" beforeDir="false" afterPath="$PROJECT_DIR$/nhl_schedule.egg-info/SOURCES.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,7 +14,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="82" />
+    <option name="cachedIndexableFilesCount" value="83" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="Git.Settings">
@@ -89,7 +88,7 @@
       <workItem from="1763476677657" duration="4852000" />
       <workItem from="1763490788471" duration="3186000" />
       <workItem from="1766018714261" duration="135000" />
-      <workItem from="1766155487164" duration="338000" />
+      <workItem from="1766155487164" duration="940000" />
     </task>
     <task id="LOCAL-00001" summary="initial">
       <option name="closed" value="true" />
@@ -155,7 +154,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763493212491</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="changed path for AG schedule">
+      <option name="closed" value="true" />
+      <created>1766155920766</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1766155920766</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -170,6 +177,7 @@
     <MESSAGE value="added oppeaselookup.csv and last year and README" />
     <MESSAGE value="updated opp ease to team def for goalie analysis" />
     <MESSAGE value="added opp offense for goalie" />
-    <option name="LAST_COMMIT_MESSAGE" value="added opp offense for goalie" />
+    <MESSAGE value="changed path for AG schedule" />
+    <option name="LAST_COMMIT_MESSAGE" value="changed path for AG schedule" />
   </component>
 </project>
