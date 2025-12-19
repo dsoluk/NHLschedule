@@ -5,7 +5,7 @@ from datetime import date
 
 # ---- User-configurable settings ----
 # Excel schedule source
-SCHEDULE_XLSX = r"C:\\Users\\soluk\\OneDrive\\Documents\\FantasyNHL\\Sources\\AG_2526_Schedule.xlsx"
+SCHEDULE_XLSX = r"C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\AG_2526_Schedule.xlsx"
 SCHEDULE_SHEET_OR_TABLE = "Schedule"
 TEAM_MAPPING_XLSX = r"C:\\Users\\soluk\\PycharmProjects\\NHLschedule\\Team2TM.xlsx"
 TEAM_MAPPING_SHEET = "Team2TM"
